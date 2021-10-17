@@ -12,48 +12,42 @@ http://localhost:5000/{blueprint}/{api}
 ```python
 import logging
 from flask import Blueprint, request, jsonify
+from flask_restx import Api, Resource, fields
 
-app_01 = Blueprint('app_01', __name__)
 logger = logging.getLogger()
 
+app_01 = Blueprint('app_01', __name__)
+api = Api(app_01, version="1.0", title="app01 API", description="app01 api description",)
+ns = api.namespace("ns01_app", description="app01 api description")
 
-@app_01.route('/app', methods=['POST'])
-def app():
-    try:
-        param = request.get_json()
-        logger.info(f'##########################')
-        logger.info(f'app01')
-        logger.info(f'##########################')
-        logger.info(f'[REQ] {param}')
 
-        return jsonify(status='OK')
-    except Exception as e:
-        logger.fatal(f'【システムエラー】{str(e)}：{str(request.get_json())}')
-        return jsonify(status='NG', error_code=500, message='【システムエラー】処理に失敗しました。\n{}'.format(str(e)))
+@ns.route('/app01', methods=['POST'])
+@api.doc(responses={404: "App not found"}, params={"APP_id": "The App ID"})
+class app01(Resource):
+
+    def post(self):
+        return jsonify(status='POST OK')
 ```
 
 ##### BluePrint api_02 작성
 ```python
 import logging
 from flask import Blueprint, request, jsonify
+from flask_restx import Api, Resource, fields
 
-app_02 = Blueprint('app_02', __name__)
 logger = logging.getLogger()
 
+app_02 = Blueprint('app_02', __name__)
+api = Api(app_02, version="1.0", title="app02 API", description="app02 api description",)
+ns = api.namespace("ns02_app", description="app02 api description")
 
-@app_02.route('/app', methods=['POST'])
-def app():
-    try:
-        param = request.get_json()
-        logger.info(f'##########################')
-        logger.info(f'app02')
-        logger.info(f'##########################')
-        logger.info(f'[REQ] {param}')
 
-        return jsonify(status='OK')
-    except Exception as e:
-        logger.fatal(f'【システムエラー】{str(e)}：{str(request.get_json())}')
-        return jsonify(status='NG', error_code=500, message='【システムエラー】処理に失敗しました。\n{}'.format(str(e)))
+@ns.route('/app02', methods=['POST'])
+@api.doc(responses={404: "App not found"}, params={"APP_id": "The App ID"})
+class app02(Resource):
+
+    def post(self):
+        return jsonify(status='POST OK')
 ```
 
 ##### Flask run.py 작성
@@ -70,8 +64,8 @@ logger = logging.getLogger()
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-app.register_blueprint(app_01, url_prefix='/app_01')
-app.register_blueprint(app_02, url_prefix='/app_02')
+app.register_blueprint(app_01, url_prefix='/a_01')
+app.register_blueprint(app_02, url_prefix='/a_02')
 
 if __name__ == '__main__':
     
